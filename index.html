@@ -1,11 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebCrawler | Levellers</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="img/icon.png">
 </head>
+
 <body>
-    
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="logo">🕷️ <span>WebCrawler</span></div>
+    <nav>
+      <a href="#features">Features</a>
+      <a href="#about">About</a><br>
+      <button id="loginBtn" class="btn">Login</button>
+      <button id="signupBtn" class="btn primary">Sign Up</button>
+    </nav>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Crawl🦀 Extract👾 Analyze📜</h1>
+      <p>Power your data pipelines with an intelligent, scalable web crawler built for the modern web.</p><br>
+      <div class="cta">
+        <button class="btncrawl" style="font-family: LevellerFont2;">Start Crawling</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features" class="features">
+    <h2>⚙️ Core Features</h2>
+    <div class="feature-grid">
+      <div class="feature">
+        <h3>Smart Crawling</h3>
+        <p>Handles JavaScript-heavy pages using headless browsers with speed and efficiency.</p>
+      </div>
+      <div class="feature">
+        <h3>Custom Extraction</h3>
+        <p>Extract only what you need — metadata, content, or links — with flexible configurations.</p>
+      </div>
+      <div class="feature">
+        <h3>Dashboard Insights</h3>
+        <p>Track crawl progress, success rates, and export structured data in real time.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2025 WebCrawler. Built by Levellers.</p>
+  </footer>
+
+  <!-- LOGIN -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeLogin">&times;</span>
+      <h2>Login</h2>
+      <input type="email" placeholder="Email" required>
+      <input type="password" placeholder="Password" required>
+      <button class="btn primary">Login</button>
+    </div>
+  </div>
+
+  <!-- SIGNUP -->
+  <div id="signupModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeSignup">&times;</span>
+      <h2>Sign Up</h2>
+      <input type="text" placeholder="Name" required>
+      <input type="email" placeholder="Email" required>
+      <input type="password" placeholder="Password" required>
+      <button class="btn primary">Create Account</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
