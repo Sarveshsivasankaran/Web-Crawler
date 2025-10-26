@@ -24,6 +24,11 @@
     padding: 0;
     box-sizing: border-box;
 }
+
+.logo {
+  cursor: pointer;
+}
+
 body {
     background: var(--bg-color);
     color: var(--text);
