@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WebCrawler | Levellers</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="/root/img/icon.png">
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="icon" href="img/icon.png">
 </head>
 
 <body>
@@ -28,6 +28,24 @@
       <div class="cta">
         <button class="btncrawl" style="font-family: LevellerFont2;">Start Crawling</button>
       </div>
+      
+      <script>
+      document.getElementById("crawlBtn").addEventListener("click", async () => {
+      const url = prompt("Enter the URL to crawl:");
+      if (!url) return alert("Please enter a valid URL");
+        document.getElementById("result").innerText = "Crawling and analyzing...";
+        const response = await fetch("/crawl", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ url })
+            });
+
+        const data = await response.json();
+        document.getElementById("result").innerText =
+        data.summary || data.error || "Something went wrong.";
+      });
+      </script>
+
     </div>
   </section>
 
@@ -78,6 +96,6 @@
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <script src="/static/script.js"></script>
 </body>
 </html>
