@@ -1,11 +1,11 @@
 @font-face {
     font-family: "LevellerFont";
-    src: url("/fonts/Metal-Mania-Regular.ttf");
+    src: url("fonts/Metal-Mania-Regular.ttf");
 }
 
 @font-face {
     font-family: "LevellerFont2";
-    src: url("/fonts/Eternal.ttf");
+    src: url("fonts/Eternal.ttf");
 }
 
 /* ---------- ROOT THEME ---------- */
