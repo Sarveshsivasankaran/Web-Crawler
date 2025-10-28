@@ -25,29 +25,44 @@
     <div class="hero-content">
       <h1>Crawl🦀 Extract👾 Analyze📜</h1>
       <p>Power your data pipelines with an intelligent, scalable web crawler built for the modern web.</p><br>
+
       <div class="cta">
-        <button class="btncrawl" style="font-family: LevellerFont2;">Start Crawling</button>
+        <button class="btncrawl" id="crawlBtn" style="font-family: LevellerFont2;">Start Crawling</button>
       </div>
-      
+
+      <div id="result" style="margin-top: 20px; color: var(--normal);"></div>
+
       <script>
-      document.getElementById("crawlBtn").addEventListener("click", async () => {
-      const url = prompt("Enter the URL to crawl:");
-      if (!url) return alert("Please enter a valid URL");
-        document.getElementById("result").innerText = "Crawling and analyzing...";
-        const response = await fetch("/crawl", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ url })
-            });
+        // ===== User Session Simulation =====
+        // Later this will come from your backend (Flask session or JWT)
+        let isLoggedIn = false; 
 
-        const data = await response.json();
-        document.getElementById("result").innerText =
-        data.summary || data.error || "Something went wrong.";
-      });
+        const crawlBtn = document.getElementById("crawlBtn");
+        const loginModal = document.getElementById("loginModal");
+        const resultDiv = document.getElementById("result");
+
+        crawlBtn.addEventListener("click", () => {
+          if (!isLoggedIn) {
+            // If not logged in, show login modal
+            loginModal.style.display = "flex";
+            resultDiv.innerText = "Please login first to start crawling.";
+          } else {
+            // If logged in, redirect to crawl page
+            window.location.href = "/crawl";
+          }
+        });
+
+        // Example: after successful login, mark session active
+        document.querySelector(".btn.primary").addEventListener("click", () => {
+          isLoggedIn = true;
+          loginModal.style.display = "none";
+          alert("Login successful! Redirecting...");
+          window.location.href = "/crawl";
+        });
       </script>
-
     </div>
   </section>
+
 
   <!-- FEATURES -->
   <section id="features" class="features">
