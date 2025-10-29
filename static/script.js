@@ -4,6 +4,7 @@ const signupModal = document.getElementById("signupModal");
 const loginBtn = document.getElementById("loginBtn");
 const signupBtn = document.getElementById("signupBtn");
 const closeLogin = document.getElementById("closeLogin");
+const closeSignup = document.getElementById("closeSignup");
 
 loginBtn.onclick = () => loginModal.style.display = "flex";
 signupBtn.onclick = () => signupModal.style.display = "flex";

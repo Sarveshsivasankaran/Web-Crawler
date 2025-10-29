@@ -173,6 +173,28 @@ nav a:hover {
   margin-bottom: 10px;
 }
 
+/* ---------- ABOUT ---------- */
+.about {
+  background: #18181F;
+  padding: 80px 20px;
+  text-align: center;
+}
+.about-content {
+  max-width: 900px;
+  margin: auto;
+}
+.about h2 {
+  color: var(--normal);
+  font-size: 2rem;
+  margin-bottom: 25px;
+}
+.about p {
+  color: #d1d1d1;
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+  line-height: 1.7;
+}
+
 /* ---------- FOOTER ---------- */
 footer {
   text-align: center;
