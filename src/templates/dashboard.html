@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Crawl Dashboard</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <header class="navbar">
+      <div class="logo">🕷️ WebCrawler</div>
+    </header>
+
+    <section class="hero" style="height: auto; padding: 60px 0">
+      <div class="hero-content">
+        <h1>Enter URLs to Crawl</h1>
+        <p>Gemini AI will summarize and analyze each page.</p>
+
+        <input
+          type="text"
+          id="urlInput"
+          placeholder="Enter a URL"
+          style="
+            width: 60%;
+            padding: 10px;
+            border-radius: 6px;
+            border: none;
+            margin-top: 20px;
+          "
+        />
+        <button class="btncrawl" id="startCrawl">Crawl Now</button>
+
+        <div
+          id="crawlResult"
+          style="margin-top: 30px; white-space: pre-wrap; text-align: left"
+        ></div>
+      </div>
+    </section>
+
+    <script>
+      document
+        .getElementById("startCrawl")
+        .addEventListener("click", async () => {
+          const url = document.getElementById("urlInput").value.trim();
+          const resultDiv = document.getElementById("crawlResult");
+
+          if (!url) return alert("Enter a valid URL!");
+
+          resultDiv.innerText = "Fetching and analyzing...";
+
+          try {
+            const response = await fetch("/crawl", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ url }),
+            });
+
+            const data = await response.json();
+            resultDiv.innerText =
+              data.summary || data.error || "Something went wrong.";
+          } catch (err) {
+            resultDiv.innerText = "Error connecting to server.";
+          }
+        });
+    </script>
+  </body>
+</html>
