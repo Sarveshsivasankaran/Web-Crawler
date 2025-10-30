@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WebCrawler | Levellers</title>
-    <link rel="stylesheet" href="../static/style.css" />
-    <link rel="icon" href="img/icon.png" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='/style.css') }}" />
+    <link rel="icon" href="{{ url_for('static', filename='/templates/img/icon.png') }}" />
   </head>
 
   <body>
@@ -125,6 +125,7 @@
       </div>
     </div>
 
+    <script src="{{ url_for('static', filename='fonts/script.js') }}"></script>
     <script>
       // ===== Session Simulation =====
       let isLoggedIn = false;
@@ -152,30 +153,27 @@
         if (event.target === signupModal) signupModal.style.display = "none";
       };
 
-      // === Crawl Button Logic ===
       crawlBtn.addEventListener("click", () => {
         if (!isLoggedIn) {
           loginModal.style.display = "flex";
           resultDiv.innerText = "Please login first to start crawling.";
         } else {
-          window.location.href = "/src/templates/dashboard.html";
+          window.location.href = "{{ url_for('dashboard') }}";
         }
       });
 
-      // === Confirm Login ===
       confirmLogin.addEventListener("click", () => {
         isLoggedIn = true;
         loginModal.style.display = "none";
         alert("Login successful! Redirecting...");
-        window.location.href = "/src/templates/dashboard.html";
+        window.location.href = "{{ url_for('dashboard') }}";
       });
 
-      // === Confirm Signup ===
       confirmSignup.addEventListener("click", () => {
         isLoggedIn = true;
         signupModal.style.display = "none";
         alert("Account created successfully! Redirecting...");
-        window.location.href = "/src/templates/dashboard.html";
+        window.location.href = "{{ url_for('dashboard') }}";
       });
     </script>
   </body>
