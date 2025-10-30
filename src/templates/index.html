@@ -158,7 +158,7 @@
           loginModal.style.display = "flex";
           resultDiv.innerText = "Please login first to start crawling.";
         } else {
-          window.location.href = "../dashboard.html";
+          window.location.href = "/src/templates/dashboard.html";
         }
       });
 
@@ -167,7 +167,7 @@
         isLoggedIn = true;
         loginModal.style.display = "none";
         alert("Login successful! Redirecting...");
-        window.location.href = "../dashboard.html";
+        window.location.href = "/src/templates/dashboard.html";
       });
 
       // === Confirm Signup ===
@@ -175,7 +175,7 @@
         isLoggedIn = true;
         signupModal.style.display = "none";
         alert("Account created successfully! Redirecting...");
-        window.location.href = "../dashboard.html";
+        window.location.href = "/src/templates/dashboard.html";
       });
     </script>
   </body>
