@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebCrawler | Levellers</title>
+    <link rel="stylesheet" href="../static/style.css" />
+    <link rel="icon" href="img/icon.png" />
+  </head>
+
+  <body>
+    <!-- NAVBAR -->
+    <header class="navbar">
+      <div class="logo">🕷️ <span>WebCrawler</span></div>
+      <nav>
+        <a href="#features">Features</a>
+        <a href="#about">About</a><br />
+        <button id="loginBtn" class="btn">Login</button>
+        <button id="signupBtn" class="btn primary">Sign Up</button>
+      </nav>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+      <div class="hero-content">
+        <h1>Crawl🦀 Extract👾 Analyze📜</h1>
+        <p>
+          Power your data pipelines with an intelligent, scalable web crawler
+          built for the modern web.
+        </p>
+        <br />
+
+        <div class="cta">
+          <button
+            class="btncrawl"
+            id="crawlBtn"
+            style="font-family: LevellerFont2"
+          >
+            Start Crawling
+          </button>
+        </div>
+
+        <div id="result" style="margin-top: 20px; color: var(--normal)"></div>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section id="features" class="features">
+      <h2>⚙️ Core Features</h2>
+      <div class="feature-grid">
+        <div class="feature">
+          <h3>Smart Crawling</h3>
+          <p>
+            Handles JavaScript-heavy pages using headless browsers with speed
+            and efficiency.
+          </p>
+        </div>
+        <div class="feature">
+          <h3>Custom Extraction</h3>
+          <p>
+            Extract only what you need — metadata, content, or links — with
+            flexible configurations.
+          </p>
+        </div>
+        <div class="feature">
+          <h3>Dashboard Insights</h3>
+          <p>
+            Track crawl progress, success rates, and export structured data in
+            real time.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT SECTION -->
+    <section id="about" class="about">
+      <div class="about-content">
+        <h2>🧠 About WebCrawler</h2>
+        <p>
+          WebCrawler | Levellers is an AI-driven platform that transforms the
+          way we collect and understand web data. Designed for modern developers
+          and data engineers, it intelligently crawls the internet, extracts
+          structured information, and summarizes key insights in real time.
+        </p>
+        <p>
+          Powered by Google’s Gemini AI, WebCrawler doesn’t just scrape pages —
+          it
+          <strong>understands</strong> them. From filtering relevant content to
+          generating concise summaries and identifying key entities, it gives
+          you actionable data rather than raw noise.
+        </p>
+        <p>
+          Whether you’re building analytics pipelines, research dashboards, or
+          trend trackers, WebCrawler delivers clean, AI-refined information from
+          across the web — fast, scalable, and transparent.
+        </p>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+      <p>© 2025 WebCrawler. Built by Levellers.</p>
+    </footer>
+
+    <!-- LOGIN MODAL -->
+    <div id="loginModal" class="modal">
+      <div class="modal-content">
+        <span class="close" id="closeLogin">&times;</span>
+        <h2>Login</h2>
+        <input type="email" placeholder="Email" required />
+        <input type="password" placeholder="Password" required />
+        <button class="btn primary" id="confirmLogin">Login</button>
+      </div>
+    </div>
+
+    <!-- SIGNUP MODAL -->
+    <div id="signupModal" class="modal">
+      <div class="modal-content">
+        <span class="close" id="closeSignup">&times;</span>
+        <h2>Sign Up</h2>
+        <input type="text" placeholder="Name" required />
+        <input type="email" placeholder="Email" required />
+        <input type="password" placeholder="Password" required />
+        <button class="btn primary" id="confirmSignup">Create Account</button>
+      </div>
+    </div>
+
+    <script>
+      // ===== Session Simulation =====
+      let isLoggedIn = false;
+
+      const crawlBtn = document.getElementById("crawlBtn");
+      const loginModal = document.getElementById("loginModal");
+      const signupModal = document.getElementById("signupModal");
+      const resultDiv = document.getElementById("result");
+
+      const loginBtn = document.getElementById("loginBtn");
+      const signupBtn = document.getElementById("signupBtn");
+      const closeLogin = document.getElementById("closeLogin");
+      const closeSignup = document.getElementById("closeSignup");
+      const confirmLogin = document.getElementById("confirmLogin");
+      const confirmSignup = document.getElementById("confirmSignup");
+
+      // === Modal Controls ===
+      loginBtn.onclick = () => (loginModal.style.display = "flex");
+      signupBtn.onclick = () => (signupModal.style.display = "flex");
+      closeLogin.onclick = () => (loginModal.style.display = "none");
+      closeSignup.onclick = () => (signupModal.style.display = "none");
+
+      window.onclick = (event) => {
+        if (event.target === loginModal) loginModal.style.display = "none";
+        if (event.target === signupModal) signupModal.style.display = "none";
+      };
+
+      // === Crawl Button Logic ===
+      crawlBtn.addEventListener("click", () => {
+        if (!isLoggedIn) {
+          loginModal.style.display = "flex";
+          resultDiv.innerText = "Please login first to start crawling.";
+        } else {
+          window.location.href = "/src/templates/dashboard.html";
+        }
+      });
+
+      // === Confirm Login ===
+      confirmLogin.addEventListener("click", () => {
+        isLoggedIn = true;
+        loginModal.style.display = "none";
+        alert("Login successful! Redirecting...");
+        window.location.href = "/src/templates/dashboard.html";
+      });
+
+      // === Confirm Signup ===
+      confirmSignup.addEventListener("click", () => {
+        isLoggedIn = true;
+        signupModal.style.display = "none";
+        alert("Account created successfully! Redirecting...");
+        window.location.href = "/src/templates/dashboard.html";
+      });
+    </script>
+  </body>
+</html>
