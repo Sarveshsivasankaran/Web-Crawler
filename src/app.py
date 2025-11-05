@@ -13,7 +13,6 @@ app = Flask(__name__)
 # Load environment variables
 PORT = os.getenv("PORT") or 8000
 API_KEY = os.getenv("API_KEY") or ""
-print(API_KEY)
 # Configure Gemini API
 genai.configure(api_key=API_KEY)
 model = genai.GenerativeModel("gemini-2.5-flash")
