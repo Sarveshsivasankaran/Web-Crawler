@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Up | WebCrawler</title>
+    <link rel="stylesheet" href="../static/style.css" />
+  </head>
+  <body>
+    <header class="navbar">
+      <div class="logo">🕷️ <span>WebCrawler</span></div>
+      <nav>
+        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('login') }}" class="btn">Login</a>
+      </nav>
+    </header>
+
+    <section class="auth">
+      <div class="auth-box">
+        <h2>Create Account</h2>
+        <input type="text" placeholder="Name" required />
+        <input type="email" placeholder="Email" required />
+        <input type="password" placeholder="Password" required />
+        <button class="btn primary" id="confirmSignup">Sign Up</button>
+        <p>
+          Already have an account?
+          <a href="{{ url_for('login') }}">Login</a>
+        </p>
+      </div>
+    </section>
+
+    <footer>
+      <p>© 2025 WebCrawler. Built by Levellers.</p>
+    </footer>
+
+    <script>
+      const confirmSignup = document.getElementById("confirmSignup");
+      confirmSignup.addEventListener("click", () => {
+        alert("Account created successfully! Redirecting...");
+        window.location.href = "{{ url_for('dashboard') }}";
+      });
+    </script>
+  </body>
+</html>

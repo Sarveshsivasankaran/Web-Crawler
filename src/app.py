@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify,url_for
 import google.generativeai as genai
 import requests
 from bs4 import BeautifulSoup
@@ -17,6 +17,16 @@ print(API_KEY)
 # Configure Gemini API
 genai.configure(api_key=API_KEY)
 model = genai.GenerativeModel("gemini-2.5-flash")
+
+@app.route("/login")
+def login():
+    return render_template("login.html")
+
+
+@app.route("/signup")
+def signup():
+    return render_template("signup.html")
+
 
 def crawl_and_extract(url):
     """Fetch webpage and extract text content"""
@@ -46,7 +56,7 @@ def crawl_and_extract(url):
 # ---------- ROUTES ---------- #
 
 @app.route("/")
-def home():
+def index():
     return render_template("index.html")
 
 @app.route("/dashboard")
