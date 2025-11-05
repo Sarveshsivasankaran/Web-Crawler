@@ -6,15 +6,21 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
+PORT = int(os.getenv("PORT", 8080))
 
 # Initialize Flask
-app = Flask(__name__)
+app = Flask(__name__,template_folder="templates",static_folder="static")
+
+# === Configure Gemini securely ===
+api_key = os.getenv("GEMINI_API_KEY")
+if not api_key:
+    raise EnvironmentError("❌  GEMINI_API_KEY environment variable not set")
 
 # Load environment variables
 PORT = os.getenv("PORT") or 8000
 API_KEY = os.getenv("API_KEY") or ""
 # Configure Gemini API
-genai.configure(api_key=API_KEY)
+genai.configure(api_key=api_key)
 model = genai.GenerativeModel("gemini-2.5-flash")
 
 @app.route("/login")
