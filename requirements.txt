@@ -3,3 +3,5 @@ google-generativeai
 requests
 beautifulsoup4
 python-dotenv
+supabase
+flask-bcrypt

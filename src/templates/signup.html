@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="../static/style.css" />
   </head>
   <body>
+    <!-- NAVBAR -->
     <header class="navbar">
       <div class="logo">🕷️ <span>WebCrawler</span></div>
       <nav>
@@ -15,17 +16,22 @@
       </nav>
     </header>
 
+    <!-- SIGNUP FORM -->
     <section class="auth">
       <div class="auth-box">
         <h2>Create Account</h2>
-        <input type="text" placeholder="Name" required />
-        <input type="email" placeholder="Email" required />
-        <input type="password" placeholder="Password" required />
+        <input type="email" id="email" placeholder="Email" required />
+        <input type="password" id="password" placeholder="Password" required />
         <button class="btn primary" id="confirmSignup">Sign Up</button>
+
         <p>
           Already have an account?
           <a href="{{ url_for('login') }}">Login</a>
         </p>
+        <div
+          id="signupMessage"
+          style="margin-top: 10px; color: var(--normal)"
+        ></div>
       </div>
     </section>
 
@@ -34,10 +40,40 @@
     </footer>
 
     <script>
-      const confirmSignup = document.getElementById("confirmSignup");
-      confirmSignup.addEventListener("click", () => {
-        alert("Account created successfully! Redirecting...");
-        window.location.href = "{{ url_for('dashboard') }}";
+      const signupBtn = document.getElementById("confirmSignup");
+      const msgDiv = document.getElementById("signupMessage");
+
+      signupBtn.addEventListener("click", async () => {
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value.trim();
+
+        if (!email || !password) {
+          msgDiv.textContent = "⚠️ Please fill in all fields.";
+          return;
+        }
+
+        msgDiv.textContent = "🧠 Creating your account...";
+
+        try {
+          const res = await fetch("/signup", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+
+          const data = await res.json();
+
+          if (res.ok) {
+            msgDiv.textContent = "✅ Account created! Redirecting to login...";
+            setTimeout(() => {
+              window.location.href = "{{ url_for('login') }}";
+            }, 1500);
+          } else {
+            msgDiv.textContent = `❌ ${data.error || "Unable to sign up"}`;
+          }
+        } catch (err) {
+          msgDiv.textContent = "🚨 Error connecting to server.";
+        }
       });
     </script>
   </body>

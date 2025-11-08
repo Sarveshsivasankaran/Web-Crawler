@@ -2,66 +2,274 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+<<<<<<< HEAD
+    <title>Dashboard | WebCrawler</title>
+    <link rel="stylesheet" href="../static/style.css" />
+    <link rel="icon" href="../templates/img/icon.png" />
+    <style>
+      :root {
+        --bg: #0d1117;
+        --card-bg: #161b22;
+        --border: #30363d;
+        --text: #e6edf3;
+        --accent: #58a6ff;
+        --danger: #f85149;
+        --success: #2ea043;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* NAVBAR */
+      .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 18px 40px;
+        background: var(--card-bg);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .navbar .logo {
+        font-weight: bold;
+        color: var(--accent);
+        font-size: 1.3rem;
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .nav-links a {
+        color: var(--text);
+        text-decoration: none;
+        font-weight: 500;
+        transition: 0.3s;
+      }
+
+      .nav-links a:hover {
+        color: var(--accent);
+      }
+
+      .logout {
+        color: var(--danger);
+        border: 1px solid var(--danger);
+        padding: 6px 12px;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: 0.3s;
+      }
+
+      .logout:hover {
+        background: var(--danger);
+        color: white;
+      }
+
+      /* MAIN DASHBOARD SECTION */
+      .dashboard-container {
+        flex-grow: 1;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 50px 20px;
+      }
+
+      .crawl-box {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 30px;
+        width: 100%;
+        max-width: 900px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      }
+
+      .crawl-header {
+        text-align: center;
+        margin-bottom: 25px;
+      }
+
+      .crawl-header h1 {
+        margin: 0;
+        font-size: 1.8rem;
+        color: var(--accent);
+      }
+
+      .crawl-header p {
+        color: #8b949e;
+      }
+
+      /* Input and Button */
+      .crawl-input-area {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 25px;
+      }
+
+      input[type="text"] {
+        flex: 1;
+        max-width: 600px;
+        padding: 12px 15px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: #0d1117;
+        color: var(--text);
+        font-size: 15px;
+        outline: none;
+      }
+
+      input[type="text"]:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 5px var(--accent);
+      }
+
+      .btncrawl {
+        background: var(--success);
+        border: none;
+        padding: 12px 20px;
+        color: white;
+        font-size: 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      .btncrawl:hover {
+        background: #3fb950;
+      }
+
+      /* Result Display */
+      #crawlResult {
+        margin-top: 25px;
+        background: #0d1117;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 20px;
+        line-height: 1.5;
+        color: #c9d1d9;
+        white-space: pre-wrap;
+        overflow-y: auto;
+        max-height: 500px;
+      }
+
+      #crawlResult h3 {
+        color: var(--accent);
+      }
+
+      footer {
+        text-align: center;
+        color: #8b949e;
+        padding: 15px 0;
+        border-top: 1px solid var(--border);
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .crawl-input-area {
+          flex-direction: column;
+        }
+        input[type="text"] {
+          width: 100%;
+        }
+      }
+    </style>
+=======
     <title>Crawl Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='/style.css') }}" />
     <link rel="icon" href="{{ url_for('static', filename='/templates/img/icon.png') }}" />
+>>>>>>> 3bf385e541334f778ef97361a05958672a8f829e
   </head>
+
   <body>
+    <!-- NAVBAR -->
     <header class="navbar">
       <div class="logo">🕷️ WebCrawler</div>
+      <div class="nav-links">
+        <a href="{{ url_for('index') }}">🏠 Home</a>
+        <a href="{{ url_for('history') }}">📜 History</a>
+        <a href="{{ url_for('logout') }}" class="logout">Logout</a>
+      </div>
     </header>
 
-    <section class="hero" style="height: auto; padding: 60px 0">
-      <div class="hero-content">
-        <h1>Enter URLs to Crawl</h1>
-        <p>Gemini AI will summarize and analyze each page.</p>
+    <!-- MAIN CONTENT -->
+    <div class="dashboard-container">
+      <div class="crawl-box">
+        <div class="crawl-header">
+          <h1>AI Web Crawler</h1>
+          <p>
+            Paste any URL below and let Gemini summarize and analyze it
+            intelligently.
+          </p>
+        </div>
 
-        <input
-          type="text"
-          id="urlInput"
-          placeholder="Enter a URL"
-          style="
-            width: 60%;
-            padding: 10px;
-            border-radius: 6px;
-            border: none;
-            margin-top: 20px;
-          "
-        />
-        <button class="btncrawl" id="startCrawl">Crawl Now</button>
+        <div class="crawl-input-area">
+          <input
+            type="text"
+            id="urlInput"
+            placeholder="🔗 https://example.com"
+          />
+          <button class="btncrawl" id="startCrawl">Crawl Now</button>
+        </div>
 
-        <div
-          id="crawlResult"
-          style="margin-top: 30px; white-space: pre-wrap; text-align: left"
-        ></div>
+        <div id="crawlResult"></div>
       </div>
-    </section>
+    </div>
+
+    <footer>© 2025 WebCrawler | Built with 💡 by Levellers</footer>
 
     <script>
-      document
-        .getElementById("startCrawl")
-        .addEventListener("click", async () => {
-          const url = document.getElementById("urlInput").value.trim();
-          const resultDiv = document.getElementById("crawlResult");
+      const crawlBtn = document.getElementById("startCrawl");
+      const resultDiv = document.getElementById("crawlResult");
 
-          if (!url) return alert("Enter a valid URL!");
+      crawlBtn.addEventListener("click", async () => {
+        const url = document.getElementById("urlInput").value.trim();
 
-          resultDiv.innerText = "Fetching and analyzing...";
+        if (!url) {
+          resultDiv.innerText = "⚠️ Please enter a valid URL.";
+          return;
+        }
 
-          try {
-            const response = await fetch("/crawl", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ url }),
-            });
+        resultDiv.innerText = "🧠 Fetching and analyzing...";
 
-            const data = await response.json();
-            resultDiv.innerText =
-              data.summary || data.error || "Something went wrong.";
-          } catch (err) {
-            resultDiv.innerText = "Error connecting to server.";
+        try {
+          const res = await fetch("/crawl", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url }),
+            credentials: "include",
+          });
+
+          const data = await res.json();
+
+          if (res.ok) {
+            resultDiv.innerHTML = `
+              <h3>${data.title || "Untitled Page"}</h3>
+              <p><strong>URL:</strong> <a href="${data.url}" target="_blank">${
+              data.url
+            }</a></p>
+              <p><strong>Summary:</strong></p>
+              <pre>${data.summary}</pre>
+              <p style="color:gray;">✅ Saved to your crawl history.</p>
+            `;
+          } else {
+            resultDiv.innerText = data.error || "❌ Crawl failed.";
           }
-        });
+        } catch (err) {
+          resultDiv.innerText = "🚨 Error connecting to server.";
+        }
+      });
     </script>
   </body>
 </html>
