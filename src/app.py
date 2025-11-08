@@ -11,7 +11,6 @@ from datetime import timedelta
 # CONFIG
 # ---------------------------------------------------
 load_dotenv()
-<<<<<<< HEAD
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 
@@ -22,20 +21,8 @@ app.config["SESSION_PERMANENT"] = True
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=7)
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 app.config["SESSION_COOKIE_SECURE"] = False  # change to True on production (HTTPS)
-=======
-PORT = int(os.getenv("PORT", 8080))
-
-# Initialize Flask
-app = Flask(__name__,template_folder="templates",static_folder="static")
-
-# === Configure Gemini securely ===
-api_key = os.getenv("GEMINI_API_KEY")
-if not api_key:
-    raise EnvironmentError("❌  GEMINI_API_KEY environment variable not set")
->>>>>>> 3bf385e541334f778ef97361a05958672a8f829e
 
 PORT = os.getenv("PORT") or 8000
-<<<<<<< HEAD
 API_KEY = os.getenv("API_KEY")
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
@@ -43,11 +30,6 @@ SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 # Initialize Supabase and Gemini
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 genai.configure(api_key=API_KEY)
-=======
-API_KEY = os.getenv("API_KEY") or ""
-# Configure Gemini API
-genai.configure(api_key=api_key)
->>>>>>> 3bf385e541334f778ef97361a05958672a8f829e
 model = genai.GenerativeModel("gemini-2.5-flash")
 
 # ---------------------------------------------------
