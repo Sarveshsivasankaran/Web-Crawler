@@ -149,20 +149,35 @@ SECRET_KEY=your_flask_secret
 <hr>
 
 <h2>🛠️ Project Structure</h2>
+
 <pre>
-WebCrawler/
-│── app.py
-│── .env
+WEB-CRAWLER/
+│── README.md
 │── requirements.txt
-│── templates/
-│     ├── index.html
-│     ├── crawl.html
-│     └── dashboard.html
-│── static/
-      ├── style.css
-      ├── script.js
-      └── img/
+│── .gitignore
+│── venv/
+│
+├── src/
+│   │── app.py
+│   │── .env
+│   │
+│   ├── static/
+│   │    ├── style.css
+│   │    ├── script.js
+│   │    └── fonts/
+│   │
+│   └── templates/
+│        ├── index.html
+│        ├── login.html
+│        ├── signup.html
+│        ├── dashboard.html
+│        ├── history.html
+│        └── img/
+│             └── icon.png
+│
+└── .dist/
 </pre>
+
 
 <hr>
 
