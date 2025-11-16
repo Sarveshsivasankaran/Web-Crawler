@@ -183,10 +183,8 @@ WebCrawler/
 <h2>✅ Future Enhancements</h2>
 <ul>
   <li>Batch URL crawling</li>
-  <li>Semantic search using vector embeddings</li>
   <li>Role-based user access</li>
-  <li>AI-enhanced crawl prioritization</li>
-  <li>Downloadable PDF/CSV reports</li>
+  <li>JWT Auth</li>
 </ul>
 
 <hr>
