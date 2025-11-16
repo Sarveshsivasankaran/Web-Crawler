@@ -16,7 +16,6 @@ from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 import os
 from datetime import timedelta
-import csv
 import io
 from reportlab.pdfgen import canvas
 
@@ -237,32 +236,6 @@ def crawl():
     ).execute()
 
     return jsonify({"title": title, "summary": ai_output, "url": url})
-
-
-# ---------- DOWNLOAD CSV ----------
-@app.route("/download/csv", methods=["POST"])
-def download_csv():
-    user_email = session.get("user_email")
-    if not user_email:
-        return jsonify({"error": "Unauthorized. Please log in first."}), 401
-
-    data = request.get_json()
-    summary = data.get("summary", "")
-    url = data.get("url", "")
-
-    output = io.StringIO()
-    writer = csv.writer(output)
-    writer.writerow(["URL", "Summary"])
-    writer.writerow([url, summary])
-
-    output.seek(0)
-
-    return send_file(
-        io.BytesIO(output.getvalue().encode()),
-        mimetype="text/csv",
-        as_attachment=True,
-        download_name="crawl_report.csv",
-    )
 
 
 # ---------- DOWNLOAD PDF ----------
