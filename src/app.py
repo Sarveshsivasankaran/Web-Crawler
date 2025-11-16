@@ -1,4 +1,13 @@
-from flask import Flask, render_template, request, jsonify, url_for, session, redirect
+from flask import (
+    Flask,
+    render_template,
+    request,
+    jsonify,
+    url_for,
+    session,
+    redirect,
+    send_file,
+)
 from flask_bcrypt import Bcrypt
 from supabase import create_client, Client
 import google.generativeai as genai
@@ -7,6 +16,10 @@ from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 import os
 from datetime import timedelta
+import csv
+import io
+from reportlab.pdfgen import canvas
+
 # ---------------------------------------------------
 # CONFIG
 # ---------------------------------------------------
@@ -31,6 +44,7 @@ SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 genai.configure(api_key=API_KEY)
 model = genai.GenerativeModel("gemini-2.5-flash")
+
 
 # ---------------------------------------------------
 # HELPERS
@@ -63,6 +77,7 @@ def crawl_and_extract(url):
     except Exception as e:
         return f"Error crawling URL: {e}", "Error"
 
+
 # ---------------------------------------------------
 # ROUTES
 # ---------------------------------------------------
@@ -87,9 +102,11 @@ def history():
 
     return render_template("history.html", results=results.data)
 
+
 @app.route("/")
 def index():
     return render_template("index.html")
+
 
 # ---------- SIGNUP ----------
 @app.route("/signup", methods=["GET", "POST"])
@@ -107,10 +124,13 @@ def signup():
             return jsonify({"error": "User already exists"}), 400
 
         hashed_pw = bcrypt.generate_password_hash(password).decode("utf-8")
-        supabase.table("users").insert({"email": email, "password": hashed_pw}).execute()
+        supabase.table("users").insert(
+            {"email": email, "password": hashed_pw}
+        ).execute()
         return jsonify({"message": "Signup successful!"})
 
     return render_template("signup.html")
+
 
 # ---------- LOGIN ----------
 @app.route("/login", methods=["GET", "POST"])
@@ -137,11 +157,13 @@ def login():
 
     return render_template("login.html")
 
+
 # ---------- LOGOUT ----------
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect(url_for("login"))
+
 
 # ---------- DASHBOARD ----------
 @app.route("/dashboard")
@@ -163,6 +185,7 @@ def dashboard():
             item["raw_text"] = ""
 
     return render_template("dashboard.html", results=results.data)
+
 
 # ---------- CRAWL ----------
 @app.route("/crawl", methods=["POST"])
@@ -203,19 +226,78 @@ def crawl():
     except Exception as e:
         ai_output = f"AI Processing Error: {e}"
 
-    supabase.table("crawl_results").insert({
-        "user_email": user_email,
-        "url": url,
-        "title": title,
-        "summary": ai_output,
-        "raw_text": text
-    }).execute()
+    supabase.table("crawl_results").insert(
+        {
+            "user_email": user_email,
+            "url": url,
+            "title": title,
+            "summary": ai_output,
+            "raw_text": text,
+        }
+    ).execute()
 
-    return jsonify({
-        "title": title,
-        "summary": ai_output,
-        "url": url
-    })
+    return jsonify({"title": title, "summary": ai_output, "url": url})
+
+
+# ---------- DOWNLOAD CSV ----------
+@app.route("/download/csv", methods=["POST"])
+def download_csv():
+    user_email = session.get("user_email")
+    if not user_email:
+        return jsonify({"error": "Unauthorized. Please log in first."}), 401
+
+    data = request.get_json()
+    summary = data.get("summary", "")
+    url = data.get("url", "")
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["URL", "Summary"])
+    writer.writerow([url, summary])
+
+    output.seek(0)
+
+    return send_file(
+        io.BytesIO(output.getvalue().encode()),
+        mimetype="text/csv",
+        as_attachment=True,
+        download_name="crawl_report.csv",
+    )
+
+
+# ---------- DOWNLOAD PDF ----------
+@app.route("/download/pdf", methods=["POST"])
+def download_pdf():
+    user_email = session.get("user_email")
+    if not user_email:
+        return jsonify({"error": "Unauthorized. Please log in first."}), 401
+
+    data = request.get_json()
+    summary = data.get("summary", "")
+    url = data.get("url", "")
+
+    buffer = io.BytesIO()
+    pdf = canvas.Canvas(buffer)
+    pdf.drawString(50, 800, "WebCrawler Report")
+    pdf.drawString(50, 780, f"URL: {url}")
+
+    pdf.drawString(50, 750, "Summary:")
+    text_obj = pdf.beginText(50, 730)
+    for line in summary.split("\n"):
+        text_obj.textLine(line)
+
+    pdf.drawText(text_obj)
+    pdf.save()
+
+    buffer.seek(0)
+
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name="crawl_report.pdf",
+        mimetype="application/pdf",
+    )
+
 
 # ---------------------------------------------------
 # MAIN

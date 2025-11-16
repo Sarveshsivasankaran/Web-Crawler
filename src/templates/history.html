@@ -48,6 +48,10 @@
           </details>
 
           <small>🕒 Crawled on: {{ item.created_at }}</small>
+          <div class="download-buttons">
+            <button id="downloadCSV-{{ loop.index }}" class="btn">Download CSV</button>
+            <button id="downloadPDF-{{ loop.index }}" class="btn">Download PDF</button>
+          </div>
         </div>
         {% endfor %}
       </div>
@@ -72,6 +76,35 @@
             title.includes(query) || url.includes(query) ? "flex" : "none";
         });
       });
+
+      // Download functionality
+      {% for item in results %}
+      document.getElementById("downloadCSV-{{ loop.index }}").onclick = async () => {
+        const response = await fetch("/download/csv", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({ url: "{{ item.url }}", summary: "{{ item.summary }}" })
+        });
+        const blob = await response.blob();
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "crawl_report.csv";
+        link.click();
+      };
+
+      document.getElementById("downloadPDF-{{ loop.index }}").onclick = async () => {
+        const response = await fetch("/download/pdf", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({ url: "{{ item.url }}", summary: "{{ item.summary }}" })
+        });
+        const blob = await response.blob();
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "crawl_report.pdf";
+        link.click();
+      };
+      {% endfor %}
     </script>
   </body>
 </html>
