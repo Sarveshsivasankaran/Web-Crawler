@@ -18,6 +18,9 @@ import os
 from datetime import timedelta
 import io
 from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+import uuid
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # ---------------------------------------------------
 # CONFIG
@@ -80,11 +83,11 @@ def crawl_and_extract(url):
 # ---------------------------------------------------
 # ROUTES
 # ---------------------------------------------------
-@app.route("/history")
-def history():
+@app.route("/api/history")
+def api_history():
     user_email = session.get("user_email")
     if not user_email:
-        return redirect(url_for("login"))  # redirect instead of raw JSON
+        return jsonify({"error": "Unauthorized"}), 401
 
     results = (
         supabase.table("crawl_results")
@@ -94,12 +97,40 @@ def history():
         .execute()
     )
 
-    # Prevent crash on None values
+    # Group by batch_id
+    batches = {}
     for item in results.data:
         if item.get("raw_text") is None:
             item["raw_text"] = ""
+        batch_id = item.get("batch_id")
+        if batch_id:
+            if batch_id not in batches:
+                batches[batch_id] = {
+                    "batch_id": batch_id,
+                    "created_at": item["created_at"],
+                    "results": [],
+                }
+            batches[batch_id]["results"].append(item)
+        else:
+            # Handle legacy single crawls as batches with one item
+            single_batch_id = f"single-{item['id']}"
+            batches[single_batch_id] = {
+                "batch_id": single_batch_id,
+                "created_at": item["created_at"],
+                "results": [item],
+            }
 
-    return render_template("history.html", results=results.data)
+    # Sort batches by created_at desc
+    sorted_batches = sorted(
+        batches.values(), key=lambda x: x["created_at"], reverse=True
+    )
+
+    return jsonify({"batches": sorted_batches})
+
+
+@app.route("/history")
+def history():
+    return render_template("history.html")
 
 
 @app.route("/")
@@ -194,48 +225,60 @@ def crawl():
         return jsonify({"error": "Unauthorized. Please log in first."}), 401
 
     data = request.get_json(silent=True) or {}
-    url = data.get("url")
+    urls = data.get("urls", [])
 
-    if not url:
-        return jsonify({"error": "No URL provided"}), 400
+    if not urls or not isinstance(urls, list):
+        return jsonify({"error": "URLs must be provided as a list"}), 400
 
-    text, title = crawl_and_extract(url)
-    if text.startswith("Error"):
-        return jsonify({"error": text}), 400
+    batch_id = str(uuid.uuid4())
 
-    prompt = f"""
-    The following web page content has been extracted:
-    ---
-    {text}
-    ---
-    1️⃣ Give me a short descriptive title for the page.
-    2️⃣ Summarize it in 5 concise bullet points.
-    3️⃣ Extract 5 key entities (people, companies, topics) and list under "Key Entities:".
-    Format:
-    Title: <short title>
-    Summary:
-    - ...
-    Key Entities:
-    - ...
-    """
+    def process_url(url):
+        text, title = crawl_and_extract(url)
+        if text.startswith("Error"):
+            return {"url": url, "error": text}
 
-    try:
-        response = model.generate_content(prompt)
-        ai_output = response.text
-    except Exception as e:
-        ai_output = f"AI Processing Error: {e}"
+        prompt = f"""
+        The following web page content has been extracted:
+        ---
+        {text}
+        ---
+        1️⃣ Give me a short descriptive title for the page.
+        2️⃣ Summarize it in 5 concise bullet points.
+        3️⃣ Extract 5 key entities (people, companies, topics) and list under "Key Entities:".
+        Format:
+        Title: <short title>
+        Summary:
+        - ...
+        Key Entities:
+        - ...
+        """
 
-    supabase.table("crawl_results").insert(
-        {
-            "user_email": user_email,
-            "url": url,
-            "title": title,
-            "summary": ai_output,
-            "raw_text": text,
-        }
-    ).execute()
+        try:
+            response = model.generate_content(prompt)
+            ai_output = response.text
+        except Exception as e:
+            ai_output = f"AI Processing Error: {e}"
 
-    return jsonify({"title": title, "summary": ai_output, "url": url})
+        supabase.table("crawl_results").insert(
+            {
+                "user_email": user_email,
+                "batch_id": batch_id,
+                "url": url,
+                "title": title,
+                "summary": ai_output,
+                "raw_text": text,
+            }
+        ).execute()
+
+        return {"url": url, "title": title, "summary": ai_output}
+
+    results = []
+    with ThreadPoolExecutor(max_workers=5) as executor:
+        futures = [executor.submit(process_url, url) for url in urls]
+        for future in as_completed(futures):
+            results.append(future.result())
+
+    return jsonify({"batch_id": batch_id, "results": results})
 
 
 # ---------- DOWNLOAD PDF ----------
@@ -268,6 +311,118 @@ def download_pdf():
         buffer,
         as_attachment=True,
         download_name="crawl_report.pdf",
+        mimetype="application/pdf",
+    )
+
+
+# ---------- DOWNLOAD BATCH PDF ----------
+@app.route("/download/batch/pdf", methods=["POST"])
+def download_batch_pdf():
+    user_email = session.get("user_email")
+    if not user_email:
+        return jsonify({"error": "Unauthorized. Please log in first."}), 401
+
+    data = request.get_json()
+    batch_id = data.get("batch_id", "")
+
+    # Fetch batch results
+    results = (
+        supabase.table("crawl_results")
+        .select("*")
+        .eq("user_email", user_email)
+        .eq("batch_id", batch_id)
+        .execute()
+    )
+
+    buffer = io.BytesIO()
+    pdf = canvas.Canvas(buffer, pagesize=letter)
+    width, height = letter
+
+    def draw_wrapped_text(pdf, text, x, y, max_width, line_height=14):
+        """Draw text with word wrapping"""
+        words = text.split()
+        lines = []
+        current_line = ""
+        for word in words:
+            test_line = current_line + " " + word if current_line else word
+            if pdf.stringWidth(test_line, "Helvetica", 10) <= max_width:
+                current_line = test_line
+            else:
+                if current_line:
+                    lines.append(current_line)
+                current_line = word
+        if current_line:
+            lines.append(current_line)
+        return lines
+
+    y = height - 50
+    pdf.setFont("Helvetica-Bold", 16)
+    pdf.drawString(50, y, f"WebCrawler Batch Report")
+    y -= 30
+    pdf.setFont("Helvetica", 12)
+    pdf.drawString(50, y, f"Batch ID: {batch_id}")
+    y -= 40
+
+    for item in results.data:
+        if y < 150:  # Check if we need a new page
+            pdf.showPage()
+            y = height - 50
+            pdf.setFont("Helvetica-Bold", 16)
+            pdf.drawString(50, y, f"WebCrawler Batch Report (continued)")
+            y -= 30
+            pdf.setFont("Helvetica", 12)
+            pdf.drawString(50, y, f"Batch ID: {batch_id}")
+            y -= 40
+
+        # URL
+        pdf.setFont("Helvetica-Bold", 12)
+        pdf.drawString(50, y, "URL:")
+        y -= 15
+        pdf.setFont("Helvetica", 10)
+        url_lines = draw_wrapped_text(pdf, item["url"], 50, y, width - 100)
+        for line in url_lines:
+            pdf.drawString(70, y, line)
+            y -= 14
+        y -= 5
+
+        # Title
+        pdf.setFont("Helvetica-Bold", 12)
+        pdf.drawString(50, y, "Title:")
+        y -= 15
+        pdf.setFont("Helvetica", 10)
+        title_lines = draw_wrapped_text(
+            pdf, item["title"] or "Untitled Page", 50, y, width - 100
+        )
+        for line in title_lines:
+            pdf.drawString(70, y, line)
+            y -= 14
+        y -= 10
+
+        # Summary
+        pdf.setFont("Helvetica-Bold", 12)
+        pdf.drawString(50, y, "Summary:")
+        y -= 15
+        pdf.setFont("Helvetica", 10)
+        summary_lines = draw_wrapped_text(pdf, item["summary"], 50, y, width - 100)
+        for line in summary_lines:
+            if y < 50:  # Check for page break in middle of summary
+                pdf.showPage()
+                y = height - 50
+                pdf.setFont("Helvetica-Bold", 12)
+                pdf.drawString(50, y, "Summary (continued):")
+                y -= 15
+                pdf.setFont("Helvetica", 10)
+            pdf.drawString(70, y, line)
+            y -= 14
+        y -= 20  # Space between items
+
+    pdf.save()
+    buffer.seek(0)
+
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name="batch_crawl_report.pdf",
         mimetype="application/pdf",
     )
 

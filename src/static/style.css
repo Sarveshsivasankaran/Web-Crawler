@@ -644,6 +644,37 @@ footer {
 }
 
 /* --------------------------
+    DOWNLOAD BUTTONS
+--------------------------- */
+.download-buttons {
+  margin-top: 15px;
+  text-align: right;
+}
+
+/* --------------------------
+    BATCH TEXTAREA
+--------------------------- */
+.batch-textarea {
+  width: 100%;
+  max-width: 600px;
+  padding: 12px 15px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #0d1117;
+  color: var(--text);
+  font-size: 15px;
+  outline: none;
+  resize: vertical;
+  min-height: 120px;
+  font-family: inherit;
+}
+
+.batch-textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 5px var(--accent);
+}
+
+/* --------------------------
     RESPONSIVE
 --------------------------- */
 @media (max-width: 600px) {

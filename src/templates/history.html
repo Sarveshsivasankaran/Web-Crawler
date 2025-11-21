@@ -31,66 +31,110 @@
         />
       </div>
 
-      {% if results and results|length > 0 %}
       <div class="crawl-list" id="crawlList">
-        {% for item in results %}
-        <div class="card">
-          <h3>{{ item.title or "Untitled Page" }}</h3>
-          <a href="{{ item.url }}" target="_blank">{{ item.url }}</a>
-          <p><strong>Summary:</strong></p>
-          <pre>{{ item.summary }}</pre>
-
-          <details>
-            <summary>View Extracted Raw Text</summary>
-            <pre>
-{{ (item.raw_text or "No raw text available")[:1000] }}...</pre
-            >
-          </details>
-
-          <small>🕒 Crawled on: {{ item.created_at }}</small>
-          <div class="download-buttons">
-            <button id="downloadPDF-{{ loop.index }}" class="btn">Download PDF</button>
-          </div>
-        </div>
-        {% endfor %}
+        <!-- Batches will be loaded here -->
       </div>
-      {% else %}
-      <div class="no-history">No crawl history found 😢</div>
-      {% endif %}
+      <div id="noHistory" class="no-history" style="display: none;">No crawl history found 😢</div>
     </div>
 
     <footer>© 2025 WebCrawler by Levellers</footer>
 
     <script>
+      // Load history on page load
+      async function loadHistory() {
+        try {
+          const res = await fetch("/api/history", { credentials: "include" });
+          const data = await res.json();
+          if (res.ok) {
+            const crawlList = document.getElementById("crawlList");
+            const noHistory = document.getElementById("noHistory");
+            if (data.batches.length === 0) {
+              noHistory.style.display = "block";
+              return;
+            }
+            noHistory.style.display = "none";
+            crawlList.innerHTML = data.batches.map(batch => `
+              <div class="card">
+                <h3>Batch ${batch.batch_id.slice(0, 8)}</h3>
+                <small>🕒 Crawled on: ${new Date(batch.created_at).toLocaleString()}</small>
+                ${batch.results.map(result => `
+                  <div class="batch-section">
+                    <h4>${result.title || "Untitled Page"}</h4>
+                    <a href="${result.url}" target="_blank">${result.url}</a>
+                    <p><strong>Summary:</strong></p>
+                    <pre>${result.summary}</pre>
+                    <details>
+                      <summary>View Extracted Raw Text</summary>
+                      <pre>${(result.raw_text || "No raw text available").slice(0, 1000)}...</pre>
+                    </details>
+                  </div>
+                `).join('')}
+                <div class="download-buttons">
+                  <button class="btn download-batch" data-batch-id="${batch.batch_id}">Download Batch PDF</button>
+                </div>
+              </div>
+            `).join('');
+          } else {
+            console.error("Failed to load history:", data.error);
+          }
+        } catch (err) {
+          console.error("Error loading history:", err);
+        }
+      }
+
       // Live Search Filter
       const searchInput = document.getElementById("searchInput");
-      const cards = document.querySelectorAll(".card");
 
       searchInput.addEventListener("input", (e) => {
         const query = e.target.value.toLowerCase();
+        const cards = document.querySelectorAll(".card");
         cards.forEach((card) => {
           const title = card.querySelector("h3").innerText.toLowerCase();
-          const url = card.querySelector("a").innerText.toLowerCase();
-          card.style.display =
-            title.includes(query) || url.includes(query) ? "flex" : "none";
+          const urls = Array.from(card.querySelectorAll("a")).map(a => a.innerText.toLowerCase());
+          const visible = title.includes(query) || urls.some(url => url.includes(query));
+          card.style.display = visible ? "flex" : "none";
         });
       });
 
-      // Download functionality
-      {% for item in results %}
-      document.getElementById("downloadPDF-{{ loop.index }}").onclick = async () => {
-        const response = await fetch("/download/pdf", {
-          method: "POST",
-          headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({ url: {{ item.url | tojson }}, summary: {{ item.summary | tojson }} })
-        });
-        const blob = await response.blob();
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "crawl_report.pdf";
-        link.click();
-      };
-      {% endfor %}
+      // Download single PDF
+      document.addEventListener("click", async (e) => {
+        if (e.target.classList.contains("download-single")) {
+          const url = e.target.dataset.url;
+          const summary = e.target.dataset.summary.replace(/\\n/g, '\n');
+          const response = await fetch("/download/pdf", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url, summary }),
+            credentials: "include"
+          });
+          const blob = await response.blob();
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(blob);
+          link.download = "crawl_report.pdf";
+          link.click();
+        }
+      });
+
+      // Download batch PDF
+      document.addEventListener("click", async (e) => {
+        if (e.target.classList.contains("download-batch")) {
+          const batchId = e.target.dataset.batchId;
+          const response = await fetch("/download/batch/pdf", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ batch_id: batchId }),
+            credentials: "include"
+          });
+          const blob = await response.blob();
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(blob);
+          link.download = "batch_crawl_report.pdf";
+          link.click();
+        }
+      });
+
+      // Load history on page load
+      loadHistory();
     </script>
   </body>
 </html>
