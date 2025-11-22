@@ -9,7 +9,7 @@ Built under the <strong>Codesapines Mentorship Program</strong></p>
 <strong>Google Gemini AI</strong> with a full-stack Flask application. It intelligently crawls webpages, extracts structured 
 information, generates summaries, identifies key entities, and stores user crawl history through Supabase.</p>
 
-<p>This project is developed by <strong>Team Levellers</strong> — Sejal, Priyans & CODE-O-PHILES.</p>
+<p>This project is developed by <strong>Team Levellers</strong> —Sarvesh, Sejal, Priyans</p>
 
 <hr>
 
