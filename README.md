@@ -143,6 +143,8 @@ SECRET_KEY=your_flask_secret
   <li>URL input console</li>
   <li>Real-time Gemini AI summaries</li>
   <li>Entity extraction</li>
+  <li>JWT Auth</li>
+  <li>Batch URL crawling</li>
   <li>User-specific crawl history table</li>
 </ul>
 
@@ -197,9 +199,7 @@ WEB-CRAWLER/
 
 <h2>✅ Future Enhancements</h2>
 <ul>
-  <li>Batch URL crawling</li>
   <li>Role-based user access</li>
-  <li>JWT Auth</li>
 </ul>
 
 <hr>
