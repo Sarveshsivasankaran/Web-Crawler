@@ -39,8 +39,9 @@
     <footer>
       <p>© 2025 WebCrawler. Built by Levellers.</p>
     </footer>
+        <script>
+      const API_BASE = "https://web-crawler-backend-51dl.onrender.com";
 
-    <script>
       const loginBtn = document.getElementById("confirmLogin");
       const msgDiv = document.getElementById("loginMessage");
 
@@ -56,24 +57,29 @@
         msgDiv.textContent = "🔍 Logging in...";
 
         try {
-          const res = await fetch("/login", {
+          const res = await fetch(`${API_BASE}/login`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password }),
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email, password })
           });
 
           const data = await res.json();
 
-          if (res.ok) {
-            alert("✅ Login successful! Redirecting...");
-            msgDiv.textContent = "✅ Login successful! Redirecting...";
-            setTimeout(() => {
-              window.location.href = "/dashboard.html";
-            }, 1000);
-          } else {
+          if (!res.ok) {
             msgDiv.textContent = `❌ ${data.error || "Invalid credentials"}`;
+            return;
           }
+
+          msgDiv.textContent = "✅ Login successful! Redirecting...";
+          setTimeout(() => {
+            window.location.href = "/dashboard.html";
+          }, 1000);
+
         } catch (err) {
+          console.error(err);
           msgDiv.textContent = "🚨 Error connecting to server.";
         }
       });
