@@ -9,7 +9,7 @@ Built under the <strong>Codesapines Mentorship Program</strong></p>
 <strong>Google Gemini AI</strong> with a full-stack Flask application. It intelligently crawls webpages, extracts structured 
 information, generates summaries, identifies key entities, and stores user crawl history through Supabase.</p>
 
-<p>This project is developed by <strong>Team Levellers</strong> — Sejal, Priyans & CODE-O-PHILES.</p>
+<p>This project is developed by <strong>Team Levellers</strong> —Sarvesh, Sejal, Priyans</p>
 
 <hr>
 
@@ -143,6 +143,8 @@ SECRET_KEY=your_flask_secret
   <li>URL input console</li>
   <li>Real-time Gemini AI summaries</li>
   <li>Entity extraction</li>
+  <li>JWT Auth</li>
+  <li>Batch URL crawling</li>
   <li>User-specific crawl history table</li>
 </ul>
 
@@ -197,9 +199,7 @@ WEB-CRAWLER/
 
 <h2>✅ Future Enhancements</h2>
 <ul>
-  <li>Batch URL crawling</li>
   <li>Role-based user access</li>
-  <li>JWT Auth</li>
 </ul>
 
 <hr>
