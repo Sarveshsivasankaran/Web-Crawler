@@ -71,6 +71,19 @@
       });
     });
 
+    function logout() {
+      fetch(`${API_BASE}/logout`, {
+        method: "GET",
+        credentials: "include"
+      })
+      .then(() => {
+        window.location.href = "/index.html";
+      })
+      .catch(() => {
+        alert("Logout failed. Please refresh.");
+      });
+    }
+
     crawlBtn.addEventListener("click", async () => {
       const mode = document.querySelector('input[name="mode"]:checked').value;
       let urls = [];
