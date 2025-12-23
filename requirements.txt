@@ -7,3 +7,4 @@ supabase
 flask-bcrypt
 reportlab
 gunicorn
+flask_cors
