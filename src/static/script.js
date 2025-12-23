@@ -72,8 +72,9 @@ if (loginSubmit) {
     }
 
     try {
-      const res = await fetch(`${API_BASE}/auth/login`, {
+      const res = await fetch(`${API_BASE}/login`, {
         method: "POST",
+        credentials: "include", // 🔥 REQUIRED FOR SESSIONS
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password })
       });
@@ -85,14 +86,11 @@ if (loginSubmit) {
         return;
       }
 
-      localStorage.setItem("access_token", data.token);
-
       alert("Login successful!");
-      loginModal.style.display = "none";
       window.location.href = "/dashboard.html";
 
     } catch (err) {
-      alert("Server error. Please try again.");
+      alert("🚨 Error connecting to server.");
     }
   };
 }
@@ -105,20 +103,20 @@ const signupSubmit = document.getElementById("signupSubmit");
 
 if (signupSubmit) {
   signupSubmit.onclick = async () => {
-    const name = document.getElementById("signupName").value.trim();
     const email = document.getElementById("signupEmail").value.trim();
     const password = document.getElementById("signupPassword").value.trim();
 
-    if (!name || !email || !password) {
+    if (!email || !password) {
       alert("Please fill all fields");
       return;
     }
 
     try {
-      const res = await fetch(`${API_BASE}/auth/signup`, {
+      const res = await fetch(`${API_BASE}/signup`, {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password })
+        body: JSON.stringify({ email, password })
       });
 
       const data = await res.json();
@@ -129,11 +127,10 @@ if (signupSubmit) {
       }
 
       alert("Account created successfully. Please login.");
-      signupModal.style.display = "none";
-      loginModal.style.display = "flex";
+      window.location.href = "/login.html";
 
     } catch (err) {
-      alert("Server error. Please try again.");
+      alert("🚨 Error connecting to server.");
     }
   };
 }
@@ -146,22 +143,15 @@ const crawlBtn = document.getElementById("crawlBtn");
 
 if (crawlBtn) {
   crawlBtn.onclick = async () => {
-    if (!isLoggedIn()) {
-      loginModal.style.display = "flex";
-      return;
-    }
-
     const url = prompt("Enter URL to crawl");
     if (!url) return;
 
     try {
       const res = await fetch(`${API_BASE}/crawl`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${getToken()}`
-        },
-        body: JSON.stringify({ url })
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ urls: [url] }) // 🔥 MUST BE LIST
       });
 
       const data = await res.json();
@@ -171,10 +161,11 @@ if (crawlBtn) {
         return;
       }
 
-      document.getElementById("result").innerText = data.summary;
+      document.getElementById("result").innerText =
+        JSON.stringify(data.results, null, 2);
 
     } catch (err) {
-      alert("Error while crawling");
+      alert("🚨 Error while crawling.");
     }
   };
 }
@@ -187,24 +178,26 @@ const batchCrawlBtn = document.getElementById("batchCrawlBtn");
 
 if (batchCrawlBtn) {
   batchCrawlBtn.onclick = async () => {
-    const urls = document.getElementById("batchUrls").value
+    const rawInput = document.getElementById("batchUrls").value;
+
+    const urls = rawInput
       .split("\n")
       .map(u => u.trim())
-      .filter(Boolean);
+      .filter(u => u.length > 0);
 
     if (urls.length === 0) {
-      alert("Enter at least one URL");
+      alert("Please enter at least one valid URL.");
       return;
     }
 
     try {
-      const res = await fetch(`${API_BASE}/batch-crawl`, {
+      const res = await fetch(`${API_BASE}/crawl`, {
         method: "POST",
+        credentials: "include", // 🔥 REQUIRED FOR FLASK SESSION
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${getToken()}`
+          "Content-Type": "application/json"
         },
-        body: JSON.stringify({ urls })
+        body: JSON.stringify({ urls }) // 🔥 BACKEND EXPECTS LIST
       });
 
       const data = await res.json();
@@ -214,11 +207,20 @@ if (batchCrawlBtn) {
         return;
       }
 
-      document.getElementById("result").innerText =
-        JSON.stringify(data.results, null, 2);
+      // Display results nicely
+      const output = data.results
+        .map(r => {
+          if (r.error) {
+            return `❌ ${r.url}\n${r.error}\n`;
+          }
+          return `✅ ${r.url}\n${r.summary}\n`;
+        })
+        .join("\n----------------------\n");
+
+      document.getElementById("batchResult").innerText = output;
 
     } catch (err) {
-      alert("Server error");
+      alert("🚨 Error while batch crawling.");
     }
   };
 }
@@ -231,18 +233,26 @@ const downloadPDF = document.getElementById("downloadPDF");
 
 if (downloadPDF) {
   downloadPDF.onclick = async () => {
-    const res = await fetch(`${API_BASE}/download/pdf`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${getToken()}`
-      }
-    });
+    try {
+      const res = await fetch(`${API_BASE}/download/pdf`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          summary: document.getElementById("result").innerText,
+          url: "User Crawled URL"
+        })
+      });
 
-    const blob = await res.blob();
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "crawl_report.pdf";
-    link.click();
+      const blob = await res.blob();
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "crawl_report.pdf";
+      link.click();
+
+    } catch (err) {
+      alert("🚨 Failed to download PDF");
+    }
   };
 }
 
