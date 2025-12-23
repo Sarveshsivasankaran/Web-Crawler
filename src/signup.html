@@ -41,41 +41,49 @@
     </footer>
 
     <script>
-      const signupBtn = document.getElementById("confirmSignup");
-      const msgDiv = document.getElementById("signupMessage");
+  const API_BASE = "https://web-crawler-backend-51dl.onrender.com";
 
-      signupBtn.addEventListener("click", async () => {
-        const email = document.getElementById("email").value.trim();
-        const password = document.getElementById("password").value.trim();
+  const signupBtn = document.getElementById("confirmSignup");
+  const msgDiv = document.getElementById("signupMessage");
 
-        if (!email || !password) {
-          msgDiv.textContent = "⚠️ Please fill in all fields.";
-          return;
-        }
+  signupBtn.addEventListener("click", async () => {
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
 
-        msgDiv.textContent = "🧠 Creating your account...";
+    if (!email || !password) {
+      msgDiv.textContent = "⚠️ Please fill in all fields.";
+      return;
+    }
 
-        try {
-          const res = await fetch("/signup", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password }),
-          });
+    msgDiv.textContent = "🧠 Creating your account...";
 
-          const data = await res.json();
-
-          if (res.ok) {
-            msgDiv.textContent = "✅ Account created! Redirecting to login...";
-            setTimeout(() => {
-              window.location.href = "/login.html";
-            }, 1500);
-          } else {
-            msgDiv.textContent = `❌ ${data.error || "Unable to sign up"}`;
-          }
-        } catch (err) {
-          msgDiv.textContent = "🚨 Error connecting to server.";
-        }
+    try {
+      const res = await fetch(`${API_BASE}/signup`, {
+        method: "POST",
+        credentials: "include",   // 🔥 REQUIRED FOR FLASK + CORS
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email, password })
       });
-    </script>
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        msgDiv.textContent = `❌ ${data.error || "Unable to sign up"}`;
+        return;
+      }
+
+      msgDiv.textContent = "✅ Account created! Redirecting to login...";
+      setTimeout(() => {
+        window.location.href = "/login.html";
+      }, 1500);
+
+    } catch (err) {
+      console.error(err);
+      msgDiv.textContent = "🚨 Error connecting to server.";
+    }
+  });
+  </script>
   </body>
 </html>

@@ -58,89 +58,101 @@
     <footer>© 2025 WebCrawler | Built with 💡 by Levellers</footer>
 
     <script>
-      const crawlBtn = document.getElementById("startCrawl");
-      const resultDiv = document.getElementById("crawlResult");
-      const singleInput = document.getElementById("singleInput");
-      const batchInput = document.getElementById("batchInput");
-      const modeRadios = document.querySelectorAll('input[name="mode"]');
+    const API_BASE = "https://web-crawler-backend-51dl.onrender.com";
 
-      // Mode switching
-      modeRadios.forEach(radio => {
-        radio.addEventListener('change', (e) => {
-          if (e.target.value === 'single') {
-            singleInput.style.display = 'block';
-            batchInput.style.display = 'none';
-          } else {
-            singleInput.style.display = 'none';
-            batchInput.style.display = 'block';
-          }
-        });
-      });
+    const crawlBtn = document.getElementById("startCrawl");
+    const resultDiv = document.getElementById("crawlResult");
+    const singleInput = document.getElementById("singleInput");
+    const batchInput = document.getElementById("batchInput");
+    const modeRadios = document.querySelectorAll('input[name="mode"]');
 
-      crawlBtn.addEventListener("click", async () => {
-        const mode = document.querySelector('input[name="mode"]:checked').value;
-        let urls = [];
-
-        if (mode === 'single') {
-          const url = singleInput.value.trim();
-          if (!url) {
-            resultDiv.innerText = "⚠️ Please enter a valid URL.";
-            return;
-          }
-          urls = [url];
+    // Mode switching
+    modeRadios.forEach(radio => {
+      radio.addEventListener("change", (e) => {
+        if (e.target.value === "single") {
+          singleInput.style.display = "block";
+          batchInput.style.display = "none";
         } else {
-          const urlsText = batchInput.value.trim();
-          urls = urlsText.split('\n').map(u => u.trim()).filter(u => u);
-          if (urls.length === 0) {
-            resultDiv.innerText = "⚠️ Please enter at least one valid URL.";
-            return;
-          }
-        }
-
-        resultDiv.innerText = `🧠 Fetching and analyzing ${urls.length} URL${urls.length > 1 ? 's' : ''}...`;
-
-        try {
-          const res = await fetch("/crawl", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ urls }),
-            credentials: "include",
-          });
-
-          const data = await res.json();
-
-          if (res.ok) {
-            if (mode === 'single') {
-              resultDiv.innerHTML = `
-                <h3>${data.results[0].title || "Untitled Page"}</h3>
-                <p><strong>URL:</strong> <a href="${data.results[0].url}" target="_blank">${data.results[0].url}</a></p>
-                <p><strong>Summary:</strong></p>
-                <pre>${data.results[0].summary}</pre>
-                <p style="color:gray;">✅ Saved to your crawl history.</p>
-              `;
-            } else {
-              resultDiv.innerHTML = `
-                <h3>Batch Crawl Completed</h3>
-                <p><strong>Batch ID:</strong> ${data.batch_id}</p>
-                <p><strong>Results:</strong></p>
-                <ul>
-                  ${data.results.map(r => `
-                    <li>
-                      <strong>${r.title || "Untitled Page"}</strong> - <a href="${r.url}" target="_blank">${r.url}</a>
-                      ${r.error ? `<span style="color:red;">(Error: ${r.error})</span>` : ''}
-                    </li>
-                  `).join('')}
-                </ul>
-                <p style="color:gray;">✅ Saved to your crawl history.</p>
-              `;
-            }
-          } else {
-            resultDiv.innerText = data.error || "❌ Crawl failed.";
-          }
-        } catch (err) {
-          resultDiv.innerText = "🚨 Error connecting to server.";
+          singleInput.style.display = "none";
+          batchInput.style.display = "block";
         }
       });
-    </script>
+    });
+
+    crawlBtn.addEventListener("click", async () => {
+      const mode = document.querySelector('input[name="mode"]:checked').value;
+      let urls = [];
+
+      if (mode === "single") {
+        const url = singleInput.value.trim();
+        if (!url) {
+          resultDiv.innerText = "⚠️ Please enter a valid URL.";
+          return;
+        }
+        urls = [url];
+      } else {
+        urls = batchInput.value
+          .split("\n")
+          .map(u => u.trim())
+          .filter(Boolean);
+
+        if (urls.length === 0) {
+          resultDiv.innerText = "⚠️ Please enter at least one valid URL.";
+          return;
+        }
+      }
+
+      resultDiv.innerText =
+        `🧠 Fetching and analyzing ${urls.length} URL${urls.length > 1 ? "s" : ""}...`;
+
+      try {
+        const res = await fetch(`${API_BASE}/crawl`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include", // 🔥 REQUIRED FOR SESSION
+          body: JSON.stringify({ urls })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          resultDiv.innerText = data.error || "❌ Crawl failed.";
+          return;
+        }
+
+        if (mode === "single") {
+          const r = data.results[0];
+          resultDiv.innerHTML = `
+            <h3>${r.title || "Untitled Page"}</h3>
+            <p><strong>URL:</strong>
+              <a href="${r.url}" target="_blank">${r.url}</a>
+            </p>
+            <p><strong>Summary:</strong></p>
+            <pre>${r.summary}</pre>
+            <p style="color:gray;">✅ Saved to your crawl history.</p>
+          `;
+        } else {
+          resultDiv.innerHTML = `
+            <h3>Batch Crawl Completed</h3>
+            <p><strong>Batch ID:</strong> ${data.batch_id}</p>
+            <ul>
+              ${data.results.map(r => `
+                <li>
+                  <strong>${r.title || "Untitled Page"}</strong> –
+                  <a href="${r.url}" target="_blank">${r.url}</a>
+                  ${r.error ? `<span style="color:red;"> (${r.error})</span>` : ""}
+                </li>
+              `).join("")}
+            </ul>
+            <p style="color:gray;">✅ Saved to your crawl history.</p>
+          `;
+        }
+
+      } catch (err) {
+        console.error(err);
+        resultDiv.innerText = "🚨 Error connecting to server.";
+      }
+    });
+  </script>
   </body>
 </html>

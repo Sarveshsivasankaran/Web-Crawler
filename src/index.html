@@ -87,15 +87,35 @@
     </footer>
 
     <script>
-      const crawlBtn = document.getElementById("crawlBtn");
-      const resultDiv = document.getElementById("result");
+    const API_BASE = "https://web-crawler-backend-51dl.onrender.com";
+    const crawlBtn = document.getElementById("crawlBtn");
+    const resultDiv = document.getElementById("result");
 
-      crawlBtn.addEventListener("click", () => {
-        resultDiv.innerText = "Please log in to start crawling.";
-        setTimeout(() => {
-          window.location.href = "/login.html";
-        }, 1000);
-      });
-    </script>
+    crawlBtn.addEventListener("click", async () => {
+      resultDiv.innerText = "🔍 Checking session...";
+
+      try {
+        const res = await fetch(`${API_BASE}/dashboard`, {
+          method: "GET",
+          credentials: "include"
+        });
+
+        if (res.ok) {
+          // User is logged in
+          window.location.href = "/dashboard.html";
+        } else {
+          // Not logged in
+          resultDiv.innerText = "Please log in to start crawling.";
+          setTimeout(() => {
+            window.location.href = "/login.html";
+          }, 800);
+        }
+
+      } catch (err) {
+        console.error(err);
+        resultDiv.innerText = "🚨 Server unreachable. Please try again later.";
+      }
+    });
+  </script>
   </body>
 </html>

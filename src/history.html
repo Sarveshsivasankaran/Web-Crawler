@@ -40,101 +40,99 @@
     <footer>© 2025 WebCrawler by Levellers</footer>
 
     <script>
-      // Load history on page load
-      async function loadHistory() {
-        try {
-          const res = await fetch("/api/history", { credentials: "include" });
-          const data = await res.json();
-          if (res.ok) {
-            const crawlList = document.getElementById("crawlList");
-            const noHistory = document.getElementById("noHistory");
-            if (data.batches.length === 0) {
-              noHistory.style.display = "block";
-              return;
-            }
-            noHistory.style.display = "none";
-            crawlList.innerHTML = data.batches.map(batch => `
-              <div class="card">
-                <h3>Batch ${batch.batch_id.slice(0, 8)}</h3>
-                <small>🕒 Crawled on: ${new Date(batch.created_at).toLocaleString()}</small>
-                ${batch.results.map(result => `
-                  <div class="batch-section">
-                    <h4>${result.title || "Untitled Page"}</h4>
-                    <a href="${result.url}" target="_blank">${result.url}</a>
-                    <p><strong>Summary:</strong></p>
-                    <pre>${result.summary}</pre>
-                    <details>
-                      <summary>View Extracted Raw Text</summary>
-                      <pre>${(result.raw_text || "No raw text available").slice(0, 1000)}...</pre>
-                    </details>
-                  </div>
-                `).join('')}
-                <div class="download-buttons">
-                  <button class="btn download-batch" data-batch-id="${batch.batch_id}">Download Batch PDF</button>
-                </div>
-              </div>
-            `).join('');
-          } else {
-            console.error("Failed to load history:", data.error);
-          }
-        } catch (err) {
-          console.error("Error loading history:", err);
-        }
-      }
+    const API_BASE = "https://web-crawler-backend-51dl.onrender.com";
 
-      // Live Search Filter
-      const searchInput = document.getElementById("searchInput");
-
-      searchInput.addEventListener("input", (e) => {
-        const query = e.target.value.toLowerCase();
-        const cards = document.querySelectorAll(".card");
-        cards.forEach((card) => {
-          const title = card.querySelector("h3").innerText.toLowerCase();
-          const urls = Array.from(card.querySelectorAll("a")).map(a => a.innerText.toLowerCase());
-          const visible = title.includes(query) || urls.some(url => url.includes(query));
-          card.style.display = visible ? "flex" : "none";
+    // Load history on page load
+    async function loadHistory() {
+      try {
+        const res = await fetch(`${API_BASE}/api/history`, {
+          credentials: "include" // 🔥 REQUIRED
         });
-      });
 
-      // Download single PDF
-      document.addEventListener("click", async (e) => {
-        if (e.target.classList.contains("download-single")) {
-          const url = e.target.dataset.url;
-          const summary = e.target.dataset.summary.replace(/\\n/g, '\n');
-          const response = await fetch("/download/pdf", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ url, summary }),
-            credentials: "include"
-          });
-          const blob = await response.blob();
-          const link = document.createElement("a");
-          link.href = URL.createObjectURL(blob);
-          link.download = "crawl_report.pdf";
-          link.click();
+        const data = await res.json();
+
+        if (!res.ok) {
+          console.error("Failed to load history:", data.error);
+          return;
         }
-      });
 
-      // Download batch PDF
-      document.addEventListener("click", async (e) => {
-        if (e.target.classList.contains("download-batch")) {
-          const batchId = e.target.dataset.batchId;
-          const response = await fetch("/download/batch/pdf", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ batch_id: batchId }),
-            credentials: "include"
-          });
-          const blob = await response.blob();
-          const link = document.createElement("a");
-          link.href = URL.createObjectURL(blob);
-          link.download = "batch_crawl_report.pdf";
-          link.click();
+        const crawlList = document.getElementById("crawlList");
+        const noHistory = document.getElementById("noHistory");
+
+        if (!data.batches || data.batches.length === 0) {
+          noHistory.style.display = "block";
+          return;
         }
-      });
 
-      // Load history on page load
-      loadHistory();
-    </script>
+        noHistory.style.display = "none";
+
+        crawlList.innerHTML = data.batches.map(batch => `
+          <div class="card">
+            <h3>Batch ${batch.batch_id.slice(0, 8)}</h3>
+            <small>🕒 Crawled on: ${new Date(batch.created_at).toLocaleString()}</small>
+
+            ${batch.results.map(result => `
+              <div class="batch-section">
+                <h4>${result.title || "Untitled Page"}</h4>
+                <a href="${result.url}" target="_blank">${result.url}</a>
+
+                <p><strong>Summary:</strong></p>
+                <pre>${result.summary}</pre>
+
+                <details>
+                  <summary>View Extracted Raw Text</summary>
+                  <pre>${(result.raw_text || "No raw text available").slice(0, 1000)}...</pre>
+                </details>
+              </div>
+            `).join("")}
+
+            <div class="download-buttons">
+              <button class="btn download-batch" data-batch-id="${batch.batch_id}">
+                Download Batch PDF
+              </button>
+            </div>
+          </div>
+        `).join("");
+
+      } catch (err) {
+        console.error("Error loading history:", err);
+      }
+    }
+
+    // Live Search Filter
+    document.getElementById("searchInput").addEventListener("input", (e) => {
+      const query = e.target.value.toLowerCase();
+      document.querySelectorAll(".card").forEach(card => {
+        const title = card.querySelector("h3").innerText.toLowerCase();
+        const urls = Array.from(card.querySelectorAll("a"))
+          .map(a => a.innerText.toLowerCase());
+        const visible = title.includes(query) || urls.some(u => u.includes(query));
+        card.style.display = visible ? "flex" : "none";
+      });
+    });
+
+    // Download batch PDF
+    document.addEventListener("click", async (e) => {
+      if (e.target.classList.contains("download-batch")) {
+        const batchId = e.target.dataset.batchId;
+
+        const response = await fetch(`${API_BASE}/download/batch/pdf`, {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ batch_id: batchId })
+        });
+
+        const blob = await response.blob();
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "batch_crawl_report.pdf";
+        link.click();
+      }
+    });
+
+    // Initial load
+    loadHistory();
+  </script>
   </body>
 </html>
