@@ -28,7 +28,7 @@ from flask_cors import CORS
 # CONFIG
 # ---------------------------------------------------
 load_dotenv()
-app = Flask(__name__)
+app = Flask(__name__, template_folder=".", static_folder="static")
 CORS(app)
 bcrypt = Bcrypt(app)
 
