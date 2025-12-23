@@ -435,3 +435,10 @@ def download_batch_pdf():
 # ---------------------------------------------------
 if __name__ == "__main__":
     app.run(debug=True, port=int(PORT))
+
+@app.route("/api/auth/status")
+def auth_status():
+    if session.get("user_email"):
+        return jsonify({"authenticated": True})
+    return jsonify({"authenticated": False}), 401
+# ---------------------------------------------------
