@@ -21,12 +21,15 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 import uuid
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from flask_cors import CORS
+
 
 # ---------------------------------------------------
 # CONFIG
 # ---------------------------------------------------
 load_dotenv()
 app = Flask(__name__)
+CORS(app)
 bcrypt = Bcrypt(app)
 
 app.secret_key = os.getenv("SECRET_KEY", "supersecretkey")
