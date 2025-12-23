@@ -29,7 +29,7 @@ from flask_cors import CORS
 # ---------------------------------------------------
 load_dotenv()
 app = Flask(__name__, template_folder=".", static_folder="static")
-CORS(app)
+CORS(app,supports_credentials=True,origins=["https://web-crawler-mu.vercel.app"])
 bcrypt = Bcrypt(app)
 
 app.secret_key = os.getenv("SECRET_KEY", "supersecretkey")
@@ -37,8 +37,8 @@ app.secret_key = os.getenv("SECRET_KEY", "supersecretkey")
 
 app.config["SESSION_PERMANENT"] = True
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=7)
-app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
-app.config["SESSION_COOKIE_SECURE"] = False  # change to True on production (HTTPS)
+app.config["SESSION_COOKIE_SAMESITE"] = "None"
+app.config["SESSION_COOKIE_SECURE"] = True  # change to True on production (HTTPS)
 
 PORT = os.getenv("PORT") or 8000
 API_KEY = os.getenv("API_KEY")
