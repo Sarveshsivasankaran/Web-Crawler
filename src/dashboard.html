@@ -1,63 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Dashboard | WebCrawler</title>
-    <link rel="stylesheet" href="/static/style.css" />
-    <link rel="icon" href="/static/img/icon.png" />
-  </head>
 
-  <body>
-    <!-- NAVBAR -->
-    <header class="navbar">
-      <div class="logo">🕷️ WebCrawler</div>
-      <div class="nav-links">
-        <a href="/index.html">🏠 Home</a>
-        <a href="/history.html">📜 History</a>
-        <a href="/index.html" class="logout">Logout</a>
-      </div>
-    </header>
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard | WebCrawler</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="icon" href="/static/img/icon.png" />
+</head>
 
-    <!-- MAIN CONTENT -->
-    <div class="dashboard-container">
-      <div class="crawl-box">
-        <div class="crawl-header">
-          <h1>AI Web Crawler</h1>
-          <p>
-            Paste any URL below and let Gemini summarize and analyze it
-            intelligently.
-          </p>
-        </div>
-
-        <div class="mode-selector">
-          <label><input type="radio" name="mode" value="single" checked> Single URL</label>
-          <label><input type="radio" name="mode" value="batch"> Batch URLs</label>
-        </div>
-
-        <div class="crawl-input-area">
-          <input
-            type="text"
-            id="singleInput"
-            placeholder="🔗 https://example.com"
-            style="display: block;"
-          />
-          <textarea
-            id="batchInput"
-            placeholder="🔗 Enter multiple URLs, one per line&#10;https://example.com&#10;https://example2.com"
-            rows="5"
-            style="display: none;"
-            class="batch-textarea"
-          ></textarea>
-          <button class="btncrawl" id="startCrawl">Crawl</button>
-        </div>
-
-        <div id="crawlResult"></div>
-      </div>
+<body>
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="logo">🕷️ WebCrawler</div>
+    <div class="nav-links">
+      <a href="/index.html">🏠 Home</a>
+      <a href="/history.html">📜 History</a>
+      <a href="#" onclick="logout()" class="logout">Logout</a>
     </div>
+  </header>
 
-    <footer>© 2025 WebCrawler | Built with 💡 by Levellers</footer>
+  <!-- MAIN CONTENT -->
+  <div class="dashboard-container">
+    <div class="crawl-box">
+      <div class="crawl-header">
+        <h1>AI Web Crawler</h1>
+        <p>
+          Paste any URL below and let Gemini summarize and analyze it
+          intelligently.
+        </p>
+      </div>
 
-    <script>
+      <div class="mode-selector">
+        <label><input type="radio" name="mode" value="single" checked> Single URL</label>
+        <label><input type="radio" name="mode" value="batch"> Batch URLs</label>
+      </div>
+
+      <div class="crawl-input-area">
+        <input type="text" id="singleInput" placeholder="🔗 https://example.com" style="display: block;" />
+        <textarea id="batchInput"
+          placeholder="🔗 Enter multiple URLs, one per line&#10;https://example.com&#10;https://example2.com" rows="5"
+          style="display: none;" class="batch-textarea"></textarea>
+        <button class="btncrawl" id="startCrawl">Crawl</button>
+      </div>
+
+      <div id="crawlResult"></div>
+    </div>
+  </div>
+
+  <footer>© 2025 WebCrawler | Built with 💡 by Levellers</footer>
+
+  <script>
     const API_BASE = "https://web-crawler-backend-51dl.onrender.com";
 
     const crawlBtn = document.getElementById("startCrawl");
@@ -154,5 +146,7 @@
       }
     });
   </script>
-  </body>
+  <script src="/static/script.js"></script>
+</body>
+
 </html>

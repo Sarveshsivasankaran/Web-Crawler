@@ -1,0 +1,2 @@
+- [x] Add `<script src="/static/script.js"></script>` to dashboard.html before the closing `</body>` tag.
+- [x] Change the logout link in dashboard.html from `<a href="/index.html" class="logout">Logout</a>` to `<a href="#" onclick="logout()" class="logout">Logout</a>` to call the logout function.
