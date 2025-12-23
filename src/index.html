@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WebCrawler | Levellers</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='/style.css') }}" />
-    <link rel="icon" href="{{ url_for('static', filename='img/icon.png') }}" />
+    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="icon" href="/static/img/icon.png" />
   </head>
 
   <body>
@@ -15,8 +15,8 @@
       <nav>
         <a href="#features">Features</a>
         <a href="#about">About</a>
-        <a href="{{ url_for('login') }}" class="btn">Login</a>
-        <a href="{{ url_for('signup') }}" class="btn primary">Sign Up</a>
+        <a href="/login.html" class="btn">Login</a>
+        <a href="/signup.html" class="btn primary">Sign Up</a>
       </nav>
     </header>
 
@@ -93,7 +93,7 @@
       crawlBtn.addEventListener("click", () => {
         resultDiv.innerText = "Please log in to start crawling.";
         setTimeout(() => {
-          window.location.href = "{{ url_for('login') }}";
+          window.location.href = "/login.html";
         }, 1000);
       });
     </script>

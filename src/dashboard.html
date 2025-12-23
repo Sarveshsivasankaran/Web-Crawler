@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <title>Dashboard | WebCrawler</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='/style.css') }}" />
-    <link rel="icon" href="{{ url_for('static', filename='/templates/img/icon.png') }}" />
+    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="icon" href="/static/img/icon.png" />
   </head>
 
   <body>
@@ -12,9 +12,9 @@
     <header class="navbar">
       <div class="logo">🕷️ WebCrawler</div>
       <div class="nav-links">
-        <a href="{{ url_for('index') }}">🏠 Home</a>
-        <a href="{{ url_for('history') }}">📜 History</a>
-        <a href="{{ url_for('logout') }}" class="logout">Logout</a>
+        <a href="/index.html">🏠 Home</a>
+        <a href="/history.html">📜 History</a>
+        <a href="/index.html" class="logout">Logout</a>
       </div>
     </header>
 

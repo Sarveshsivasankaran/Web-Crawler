@@ -3,33 +3,33 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login | WebCrawler</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='/style.css') }}"/>
+    <title>Sign Up | WebCrawler</title>
+    <link rel="stylesheet" href="/static/style.css" />
   </head>
   <body>
     <!-- NAVBAR -->
     <header class="navbar">
       <div class="logo">🕷️ <span>WebCrawler</span></div>
       <nav>
-        <a href="{{ url_for('index') }}">Home</a>
-        <a href="{{ url_for('signup') }}" class="btn primary">Sign Up</a>
+        <a href="/index.html">Home</a>
+        <a href="/login.html" class="btn">Login</a>
       </nav>
     </header>
 
-    <!-- LOGIN FORM -->
+    <!-- SIGNUP FORM -->
     <section class="auth">
       <div class="auth-box">
-        <h2>Login</h2>
+        <h2>Create Account</h2>
         <input type="email" id="email" placeholder="Email" required />
         <input type="password" id="password" placeholder="Password" required />
-        <button class="btn primary" id="confirmLogin">Login</button>
+        <button class="btn primary" id="confirmSignup">Sign Up</button>
 
         <p>
-          Don’t have an account?
-          <a href="{{ url_for('signup') }}">Sign up</a>
+          Already have an account?
+          <a href="/login.html">Login</a>
         </p>
         <div
-          id="loginMessage"
+          id="signupMessage"
           style="margin-top: 10px; color: var(--normal)"
         ></div>
       </div>
@@ -40,10 +40,10 @@
     </footer>
 
     <script>
-      const loginBtn = document.getElementById("confirmLogin");
-      const msgDiv = document.getElementById("loginMessage");
+      const signupBtn = document.getElementById("confirmSignup");
+      const msgDiv = document.getElementById("signupMessage");
 
-      loginBtn.addEventListener("click", async () => {
+      signupBtn.addEventListener("click", async () => {
         const email = document.getElementById("email").value.trim();
         const password = document.getElementById("password").value.trim();
 
@@ -52,10 +52,10 @@
           return;
         }
 
-        msgDiv.textContent = "🔍 Logging in...";
+        msgDiv.textContent = "🧠 Creating your account...";
 
         try {
-          const res = await fetch("/login", {
+          const res = await fetch("/signup", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password }),
@@ -64,13 +64,12 @@
           const data = await res.json();
 
           if (res.ok) {
-            alert("✅ Login successful! Redirecting...");
-            msgDiv.textContent = "✅ Login successful! Redirecting...";
+            msgDiv.textContent = "✅ Account created! Redirecting to login...";
             setTimeout(() => {
-              window.location.href = "{{ url_for('dashboard') }}";
-            }, 1000);
+              window.location.href = "/login.html";
+            }, 1500);
           } else {
-            msgDiv.textContent = `❌ ${data.error || "Invalid credentials"}`;
+            msgDiv.textContent = `❌ ${data.error || "Unable to sign up"}`;
           }
         } catch (err) {
           msgDiv.textContent = "🚨 Error connecting to server.";
